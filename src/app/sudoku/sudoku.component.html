@@ -1,0 +1,176 @@
+<html>
+<mat-spinner *ngIf="isLoading"></mat-spinner>
+
+<body *ngIf="!isLoading">
+  <div>
+    <div class="column left">
+      <div class="one-half">
+        <div class="info">
+          <span *ngIf="currentDifficulty != '' && !isCreating"> TEZINA: {{currentDifficulty}} </span>
+          <br />
+          <br />
+
+        </div>
+      </div>
+      <div class="one-half" *ngIf="!isCreating">
+        <label style="font-size: larger;">PODESAVANJE ALGORITMA</label>
+        <br />
+        <br />
+        <section class="parameters-section">
+          <mat-checkbox class="button-margin" [(ngModel)]="fc">Forward checking</mat-checkbox>
+        </section>
+        <section class="parameters-section">
+          <mat-checkbox class="button-margin" [(ngModel)]="arc">Arc consistency</mat-checkbox>
+        </section>
+
+        <br />
+
+        <label> Izbor promenljive: </label>
+        <mat-radio-group class="parameters-section" [(ngModel)]="varsOrder">
+          <mat-radio-button class="button-margin" [value]="2">
+            MRV
+          </mat-radio-button>
+          <mat-radio-button class="button-margin" [value]="1">
+            MCV
+          </mat-radio-button>
+          <mat-radio-button class="button-margin" [value]="0">
+            Redom
+          </mat-radio-button>
+        </mat-radio-group>
+        <br />
+        <label> Izbor vrednosti: </label>
+
+        <mat-radio-group class="parameters-section" [(ngModel)]="valuesOrder">
+          <mat-radio-button class="button-margin" [value]="1">
+            LCV
+          </mat-radio-button>
+          <mat-radio-button class="button-margin" [value]="0">
+            Redom
+          </mat-radio-button>
+
+        </mat-radio-group>
+
+      </div>
+
+
+
+    </div>
+    <div class="column middle">
+      <mat-card>
+        <mat-grid-list cols="9" rowHeight="11%" gutterSize="0%">
+          <mat-grid-tile *ngFor="let cell of currentSudoku; let i = index" [ngClass]="{
+          'bottom-bold-tile': i == 18 || i == 19 || i == 21 || i == 22 || i == 24 || i == 25 || i == 26 || i == 45 || i == 46 || i == 48 || i == 49 || i == 51 || i == 52 || i == 53 ,
+          'right-bold-tile': (i % 3) == 2 && !(((i / 9) >= 2 && (i / 9) < 3) || ((i / 9) >= 5 && (i / 9) < 6)) && (i % 9) != 8,
+          'normal-bold-tile': !(((i / 9) >= 2 && (i / 9) < 3) || ((i / 9) >= 5 && (i / 9) < 6)) && !((i % 3) == 2) || (i % 9 == 8 && i != 26 && i != 53) ,
+          'bottom_right-bold-tile': i == 20 || i == 23  || i == 47 || i == 50
+          }"
+          [style.background-color]="
+          currentSoluton.length > 0 && currentSoluton[currentStepDisplay.index].index == i ? 'aqua' : 'inherit'">
+
+            <p *ngIf="cell.value != 0 && !isCreating"
+              [ngClass]="{
+                'normal-cell': !currentSolutionIndexes.includes(cell.index),
+                'solved-cell': currentSolutionIndexes.includes(cell.index)
+              }">
+              {{ cell.value }}
+            </p>
+
+
+
+            <input matInput *ngIf="isCreating" [(ngModel)]="cell.value" placeholder="Unos">
+
+
+          </mat-grid-tile>
+
+
+
+
+        </mat-grid-list>
+      </mat-card>
+    </div>
+    <div class="column right">
+      <div class="one-third">
+        <div class="info" *ngIf="!isSolving && !isCreating">
+          IZABERITE SUDOKU
+          <br />
+          <br />
+          REDNI BROJ:
+          <br />
+          {{ currentIndex + 1 }}. SUDOKU
+
+        </div>
+        <br/>
+        <button *ngIf="!isSolving && !isCreating"
+        mat-raised-button color="warn"
+        style="margin-top: 10px;" (click)="onEnterCreateMode()">
+            NAPRAVI
+        </button>
+        <button *ngIf="isCreating"
+        mat-raised-button color="warn"
+        style="margin-top: 10px;" (click)="onCreateSudoku()">
+            UCITAJ
+        </button>
+        <div class="info" *ngIf="!isCompleted && currentStepCounter > -1">
+          {{currentStepDisplay.num}}. KORAK
+          <br />
+          <br />
+          <p *ngIf="currentStepCounter > -1">DOMEN PROMENLJIVE:</p>
+          <br />
+          <br />
+          <p *ngIf="currentStepCounter > -1">
+            [
+            <ng-container *ngFor="let value of currentStepDisplay.domain; let i = index">
+              <span *ngIf="i > 0"> ,</span>
+
+              <span [style.color]="value==currentStepDisplay.value ? 'red' : 'black'"> {{ value }} </span>
+
+            </ng-container>
+            ]
+          </p>
+        </div>
+        <div class="info" *ngIf="isCompleted">
+          VREME IZVRSAVANJA:
+          <br />
+          <br />
+          {{time}}ms
+          <br />
+          <br />
+          BROJ KORAKA ALGORITMA:
+          <br />
+          <br />
+          {{currentSteps.length}}
+        </div>
+      </div>
+      <div class="one-third">
+
+        <button *ngIf="!isCompleted && isSolving && currentStepCounter > -1"
+        mat-raised-button color="primary"
+        style="margin-top: 10px; margin-right: 5px;" (click)="onPrevious()">
+            PRETHODNI
+        </button>
+
+        <button *ngIf="!isCompleted && !isCreating" mat-raised-button color="primary" (click)="onNext()">
+          <span *ngIf="!isSolving || currentStepCounter > -1">SLEDECI</span>
+          <span *ngIf="isSolving && currentStepCounter == -1">KORACI</span>
+        </button>
+        <br/>
+        <button *ngIf="!isSolving && !isCreating && currentIndex > 5" mat-raised-button color="warn"
+          style="margin-bottom: 10px" (click)="onDeleteSudoku()">
+          IZBRISI
+
+        </button>
+      </div>
+      <div class="one-third">
+
+        <button *ngIf="!isSolving && !isCompleted && !isCreating" mat-raised-button color="accent" style="margin-bottom: 15px;"
+          (click)="onGetSolution()">IZABERI</button>
+        <button *ngIf="isSolving && !isCompleted" mat-raised-button color="accent" style="margin-top: 15px;"
+          (click)="onSolveSudoku()">RESI</button>
+        <button *ngIf="isCompleted || isCreating" mat-raised-button color="accent" style="margin-top: 15px;"
+          (click)="onRefresh()">POVRATAK</button>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

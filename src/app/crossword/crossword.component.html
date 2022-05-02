@@ -1,0 +1,237 @@
+<html>
+<mat-spinner *ngIf="isLoading"></mat-spinner>
+
+<body *ngIf="!isLoading">
+  <div>
+    <div class="column left">
+      <div class="one-half" *ngIf="!isCreating">
+        <!--RECI-->
+        <div style="font-weight: bold;">
+          RECI UKRSTENICE:
+        </div>
+        <br />
+
+        <ng-container *ngFor="let value of currentValues; let i = index">
+          <span *ngIf="i > 0">,</span>
+          {{i + 1}} ->
+          <span [style.color]="currentStepDisplay.value == (i + 1) ? 'red': 'black'">
+            {{value.value}}
+          </span>
+        </ng-container>
+      </div>
+
+
+
+      <div class="one-half" *ngIf="isCreating">
+        <!--NAPRAVI-->
+        <div style="font-weight: bold;">
+          PODESAVANJA UKRSTENICE:
+        </div>
+        <br />
+        <input matInput placeholder="Unesi rec" [(ngModel)]="inputWord" />
+        <br />
+        <button mat-raised-button color="primary" style="margin-top: 10px;" (click)="onAddWord()">
+          DODAJ REC</button>
+        <br/>
+        <br/>
+        <label> SIRINA UKRSTENICE: </label>
+        <input matInput [(ngModel)]="inputWidth" (input)="displayCrossword()" />
+        <br />
+        <br />
+        <label> DUZINA UKRSTENICE: </label>
+        <input matInput [(ngModel)]="inputHeight" (input)="displayCrossword()" />
+        <br />
+
+      </div>
+
+
+      <div class="one-half" *ngIf="!isCreating">
+        <!--PODESAVANJA ALOGIRTMA-->
+        <label style="font-size: larger;">PODESAVANJE ALGORITMA</label>
+        <br />
+        <br />
+        <section class="parameters-section">
+          <mat-checkbox class="button-margin" [(ngModel)]="fc">Forward checking</mat-checkbox>
+        </section>
+        <section class="parameters-section">
+          <mat-checkbox class="button-margin" [(ngModel)]="arc">Arc consistency</mat-checkbox>
+        </section>
+
+        <br />
+
+        <label> Izbor promenljive: </label>
+        <mat-radio-group class="parameters-section" [(ngModel)]="varsOrder">
+          <mat-radio-button class="button-margin" [value]="2">
+            MRV
+          </mat-radio-button>
+          <mat-radio-button class="button-margin" [value]="1">
+            MCV
+          </mat-radio-button>
+          <mat-radio-button class="button-margin" [value]="0">
+            Redom
+          </mat-radio-button>
+        </mat-radio-group>
+        <br />
+        <label> Izbor vrednosti: </label>
+        <mat-radio-group class="parameters-section" [(ngModel)]="valuesOrder">
+          <mat-radio-button class="button-margin" [value]="1">
+            LCV
+          </mat-radio-button>
+          <mat-radio-button class="button-margin" [value]="0">
+            Redom
+          </mat-radio-button>
+
+        </mat-radio-group>
+
+      </div>
+      <!--KRAJ-->
+
+
+
+      <div class="one-half" *ngIf="isCreating && isClicked">
+        <!-- KREIRANJE UKRSTENICE-->
+
+        <label> IZABRANA CELIJA: </label>
+        <section class="parameters-section">
+          <mat-checkbox class="button-margin" [(ngModel)]="isBlack">CRNO POLJE</mat-checkbox>
+        </section>
+
+        <br />
+
+        <ng-container *ngIf="!isBlack">
+          <section class="parameters-section">
+            <mat-checkbox class="button-margin" [(ngModel)]="isHorizontal">HORIZONTALNO</mat-checkbox>
+          </section>
+          <section class="parameters-section">
+            <mat-checkbox class="button-margin" [(ngModel)]="isVertical">VERTIKALNO</mat-checkbox>
+          </section>
+
+
+          <input matInput *ngIf="isHorizontal" [(ngModel)]="horizontalLabel" placeholder="Horizontalna labela" />
+          <input matInput *ngIf="isHorizontal" [(ngModel)]="horizontalLength" placeholder="Duzina horizontalne reci" />
+          <br />
+          <br />
+          <input matInput *ngIf="isVertical" [(ngModel)]="verticalLabel" placeholder="Vertikalna labela" />
+          <input matInput *ngIf="isVertical" [(ngModel)]="verticalLength" placeholder="Duzina vertikalne reci" />
+          <br/>
+
+
+        </ng-container>
+        <button mat-raised-button color="primary" style="margin-top: 10px;" (click)="onSaveCell(cellIndex)">
+          SACUVAJ</button>
+      </div>
+      <!--KRAJ-->
+
+    </div>
+    <div class="column middle">
+      <mat-card>
+        <mat-grid-list [cols]="currentWidth" rowHeight="fit" gutterSize="0%">
+          <mat-grid-tile *ngFor="let cell of currentDisplay; let i = index" (click)="onPickCell(i)"
+            [style.border-width]="isCreating && cellIndex == i && isClicked ? 'thick' : 'thin'"
+            [style.background-color]="cell.isBlack ? 'black' : 'inherit'">
+            <p *ngIf="cell.horizontalLabel != 0 && !cell.isBlack" class="bottomleft">
+              {{ cell.horizontalLabel }}
+            </p>
+            <p *ngIf="cell.verticalLabel != 0 && !cell.isBlack" class="topright">
+              {{ cell.verticalLabel }}
+            </p>
+            <p *ngIf="cell.value != ''" class="info"
+              [style.color]="currentMarkedCells.includes(cell) ? 'red' : 'black'">
+              {{ cell.value }}
+            </p>
+          </mat-grid-tile>
+        </mat-grid-list>
+      </mat-card>
+    </div>
+    <div class="column right">
+      <div class="one-third">
+        <div class="info" *ngIf="!isSolving">
+          IZABERITE UKRSTENICU
+          <br />
+          <br />
+          REDNI BROJ:
+          <br />
+          {{ currentIndex + 1 }}. UKRSTENICA
+        </div>
+        <br />
+        <button *ngIf="!isSolving && !isCreating" mat-raised-button color="warn" style="margin-top: 10px;"
+          (click)="onEnterCreateMode()">
+          NAPRAVI
+        </button>
+        <button *ngIf="isCreating" mat-raised-button color="warn" style="margin-top: 10px;"
+          (click)="onCreateCrossword()">
+          UCITAJ
+        </button>
+        <div class="info" *ngIf="!isCompleted && currentStepCounter > -1">
+          {{currentStepDisplay.num}}. KORAK
+          <br />
+          <br />
+          Promenljiva:
+          <br />
+          <span *ngIf="currentSolution[currentStepDisplay.index].isHorizontal">
+            {{ currentSolution[currentStepDisplay.index].label}} Horizontalno
+          </span>
+          <span *ngIf="!currentSolution[currentStepDisplay.index].isHorizontal">
+            {{ currentSolution[currentStepDisplay.index].label}} Vertikalno
+          </span>
+
+          <br />
+          <br />
+
+          <p *ngIf="currentStepCounter > -1">DOMEN PROMENLJIVE:</p>
+          <br />
+
+          <p *ngIf="currentStepCounter > -1"> [
+            <ng-container *ngFor="let value of currentStepDisplay.domain; let i = index">
+              <span *ngIf="i > 0"> ,</span>
+
+              <span [style.color]="value==currentStepDisplay.value ? 'red' : 'black'"> {{ value }} </span>
+
+            </ng-container>
+            ]
+          </p>
+        </div>
+        <div class="info" *ngIf="isCompleted">
+          VREME IZVRSAVANJA:
+          <br />
+          <br />
+          {{time}}ms
+          <br />
+          <br />
+          BROJ KORAKA ALGORITMA:
+          <br />
+          <br />
+          {{currentSteps.length}}
+        </div>
+      </div>
+      <div class="one-third">
+        <button *ngIf="!isCompleted && isSolving && currentStepCounter > -1"
+          mat-raised-button color="primary"
+          style="margin-top: 10px; margin-right: 5px;" (click)="onPrevious()">
+              PRETHODNI
+          </button>
+
+        <button *ngIf="!isCompleted && !isCreating" mat-raised-button color="primary" (click)="onNext()">
+          <span *ngIf="!isSolving || currentStepCounter > -1">SLEDECI</span>
+          <span *ngIf="isSolving && currentStepCounter == -1">KORACI</span>
+        </button>
+        <br/>
+        <button *ngIf="!isSolving && !isCreating && currentIndex > 2" mat-raised-button color="warn"
+          style="margin-bottom: 20px" (click)="onDeleteCrossword()">
+          IZBRISI
+        </button>
+      </div>
+      <div class="one-third">
+        <br/>
+        <button *ngIf="!isSolving && !isCompleted && !isCreating" mat-raised-button color="accent" style="margin-top: 10px;"
+          (click)="onGetSolution()">IZABERI</button>
+        <button *ngIf="isSolving && !isCompleted" mat-raised-button color="accent" style="margin-top: 10px;"
+          (click)="onSolveCrossword()">RESI</button>
+        <button *ngIf="isCompleted || isCreating" mat-raised-button color="accent" style="margin-top: 10px;"
+          (click)="onRefresh()">POVRATAK</button>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

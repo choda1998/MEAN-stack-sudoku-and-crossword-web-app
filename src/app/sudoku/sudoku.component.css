@@ -1,0 +1,162 @@
+* {
+  box-sizing: border-box;
+}
+
+
+
+label {
+  text-align: center;
+  font-weight: bold;
+}
+.parameters-section {
+  display: flex;
+  align-content: center;
+  align-items: center;
+  height: 30px;
+}
+
+.button-margin {
+  margin: 0 20px;
+}
+
+.radio-group-section {
+  display: flex;
+
+  margin: 15px 0;
+}
+
+
+
+
+mat-card {
+  background-color: seashell;
+  height: 95%;
+}
+
+mat-spinner {
+  margin: auto;
+}
+
+button {
+  height: 50px;
+  width: 100px;
+  margin-top: 4rem;
+}
+
+.normal-cell {
+  font-weight: bolder;
+  font-size: large;
+  color: black;
+}
+
+.solved-cell {
+  font-weight: bolder;
+  font-size: large;
+  color: red;
+}
+
+.right-bold-tile {
+  background-color: seashell;
+  border-style: solid;
+  border-right-width: thick;
+  border-bottom-width: thin;
+  border-left-width: thin;
+  border-top-width: thin;
+  border-color: black;
+  margin: 0%;
+}
+
+.normal-bold-tile {
+  background-color: seashell;
+  border-style: solid;
+  border-right-width: thin;
+  border-bottom-width: thin;
+  border-left-width: thin;
+  border-top-width: thin;
+  border-color: black;
+  margin: 0%;
+}
+
+
+.bottom-bold-tile {
+  background-color: seashell;
+  border-style: solid;
+  border-right-width: thin;
+  border-bottom-width: thick;
+  border-left-width: thin;
+  border-top-width: thin;
+  border-color: black;
+  margin: 0%;
+}
+.bottom_right-bold-tile {
+  background-color: seashell;
+  border-style: solid;
+  border-right-width: thick;
+  border-bottom-width: thick;
+  border-left-width: thin;
+  border-top-width: thin;
+  border-color: black;
+  margin: 0%;
+}
+
+html,
+body {
+  width: 100%;
+  margin: 0px;
+  height: 100%;
+}
+
+.column {
+  border-color: indigo;
+  border-style: solid;
+  float: left;
+  padding: 10px;
+  height: 90vh;
+}
+
+.left,
+.right {
+  width: 25%;
+  background-color: #c5cae9;
+}
+
+.middle {
+  width: 50%;
+}
+
+.info {
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: large;
+  font-weight: bold;
+  text-align: center;
+  padding: 20px;
+}
+
+
+.one-half {
+  margin-top: 1rem;
+  width: 100%;
+  height: 50%;
+  text-align: center;
+}
+
+.one-third {
+  margin-top: 1rem;
+  width: 100%;
+  height: 30%;
+  text-align: center;
+}
+
+
+input {
+  width: 100%;
+  height: 100%;
+}
+
+
+mat-form-field {
+  width: 100%;
+  height: 100%;
+  display: inline-flex;
+}
+
